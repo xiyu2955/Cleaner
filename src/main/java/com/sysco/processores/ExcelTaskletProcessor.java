@@ -87,7 +87,7 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
 
                     }
                 }
-                log.info("The totale number that will to update is {} and the number that failed to update is {}, and failed data is {}",prams.length ,faildList.size(), faildList);
+                log.info("The total number that will to update is {} and the number that failed to update is {}, and failed data is {}",prams.length ,faildList.size(), faildList);
             }
 
 
@@ -96,13 +96,12 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
             private void backup(List<CdsLinkSchedule> dbData) {
                 if (CollectionUtils.isEmpty(dbData)) return;
                 try {
-                    if (Files.exists(bakFile.toPath())) {
-                        Files.writeString(bakFile.toPath(), JsonUtils.OBJECT_MAPPER.writeValueAsString(dbData) + System.lineSeparator(), StandardCharsets.UTF_8, StandardOpenOption.APPEND);
-                        if (Files.size(bakFile.toPath()) >= 500 * 1024 * 1024) {
-                            bakFile = new File(pathName + "bak"+ index.decrementAndGet()+".json");
-                        }
-                    }else {
+                    if (!Files.exists(bakFile.toPath())) {
                         Files.createFile(bakFile.toPath());
+                    }
+                    Files.writeString(bakFile.toPath(), JsonUtils.OBJECT_MAPPER.writeValueAsString(dbData) + System.lineSeparator(), StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+                    if (Files.size(bakFile.toPath()) >= 500 * 1024 * 1024) {
+                        bakFile = new File(pathName + "bak"+ index.decrementAndGet()+".json");
                     }
                 } catch (Exception e) {
                     log.error("current batch backup failed, data" + dbData, e);
