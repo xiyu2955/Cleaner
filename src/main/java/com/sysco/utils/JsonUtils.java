@@ -5,9 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public abstract class JsonUtils {
-    public static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder().build();
+    public static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder().addModule(new JavaTimeModule()).build();
 
     /**
      * Converts a Java object to a JSON string.

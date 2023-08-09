@@ -41,7 +41,7 @@ public class CdsLinkScheduleDaoImpl implements CdsLinkScheduleDao {
     @Override
     public int[] updateBySiteAndCustomer(Map<String, ?>[] prams) {
         String sql = "UPDATE cds_link_schedule " +
-                "SET designated_delivery=:designatedDelivery, cut_off_su=:cutOffSu, cut_off_mo=:cutOffMo, cut_off_tu=:cutOffTu, cut_off_we=:cutOffWe, cut_off_th=:cutOffTh, cut_off_fr=:cutOffFr, cut_off_sa=:cutOffSa, send_data_status=:sendDataStatus, modified_timestamp=CURRENT_TIMESTAMP,sync_to_as400_status=:syncToAs400RetryTimes,routing_group_su=:routingGroupSu, routing_group_mo=:routingGroupMo, routing_group_tu=:routingGroupTu, routing_group_we=:routingGroupWe, routing_group_th=:routingGroupTh, routing_group_fr=:routingGroupFr, routing_group_sa=:routingGroupSa " +
+                "SET designated_delivery=:designatedDelivery, cut_off_su=:cutOffSu, cut_off_mo=:cutOffMo, cut_off_tu=:cutOffTu, cut_off_we=:cutOffWe, cut_off_th=:cutOffTh, cut_off_fr=:cutOffFr, cut_off_sa=:cutOffSa, send_data_status=:sendDataStatus, modified_timestamp=CURRENT_TIMESTAMP,sync_to_as400_status=:syncToAs400Status,routing_group_su=:routingGroupSu, routing_group_mo=:routingGroupMo, routing_group_tu=:routingGroupTu, routing_group_we=:routingGroupWe, routing_group_th=:routingGroupTh, routing_group_fr=:routingGroupFr, routing_group_sa=:routingGroupSa " +
                 "from customer_delivery_schedule where customer_delivery_schedule.id = cds_link_schedule.cds_id " +
                 "and customer_delivery_schedule.opco_number =:opcoNumber " +
                 "and customer_delivery_schedule.customer_number =:customerNumber";

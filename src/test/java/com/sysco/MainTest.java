@@ -14,8 +14,8 @@ public class MainTest {
     public static void main(String[] args) throws FileNotFoundException {
 
         // 输入输出文件路径
-        String src = "C:\\Users\\ARMIN.YU\\Desktop\\CDSM_Data_review - Copy.xlsx";
-        String dest = "C:\\Users\\ARMIN.YU\\Desktop\\data";
+        String src = "D:\\data\\CDSM_Data_review.xlsx";
+        String dest = "D:\\data\\data";
 
         // 预计每个sheet的行数
         int rowsPerSheet = 10000;

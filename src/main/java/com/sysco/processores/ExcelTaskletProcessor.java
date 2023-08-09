@@ -61,7 +61,7 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
 
                 cachedDataList.add(data);
                 if (cachedDataList.size() >= BATCH_COUNT) {
-                    backAndupdate(cachedDataList);
+                    backAndUpdate(cachedDataList);
                     cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
                 }
             }
@@ -69,25 +69,25 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
 
             @Override
             public void doAfterAllAnalysed(AnalysisContext context) {
-                backAndupdate(cachedDataList);
+                backAndUpdate(cachedDataList);
             }
 
 
-            private void backAndupdate(List<ConfigDataModel> cachedDataList) {
+            private void backAndUpdate(List<ConfigDataModel> cachedDataList) {
 
                 List<CdsLinkSchedule> dbData = queryFromDb(cachedDataList);
                 backup(dbData);
                 HashMap<String, ?>[] prams = convertPrams(cachedDataList, dbData);
                 int[] result = cdsLinkScheduleDao.updateBySiteAndCustomer(prams);
 
-                int number = 0;
+                ArrayList<HashMap<String, ?>> faildList = new ArrayList<>();
                 for (int i = 0; i < result.length; i++) {
                     if (result[i] == 0) {
-                        number++;
-                        log.info("failed update's param is {}", prams[i]);
+                        faildList.add(prams[i]);
+
                     }
                 }
-                log.info("the number of updating successfully is {} and parms = {}", result.length-number, prams);
+                log.info("The totale number that will to update is {} and the number that failed to update is {}, and failed data is {}",prams.length ,faildList.size(), faildList);
             }
 
 
@@ -110,18 +110,19 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
             }
 
             private List<CdsLinkSchedule> queryFromDb(List<ConfigDataModel> cachedDataList){
-                return cachedDataList.stream().map(model -> {
+                List<CdsLinkSchedule> result = cachedDataList.stream().map(model -> {
                     try {
-                        CdsLinkSchedule schedule = cdsLinkScheduleDao.queryBySiteAndCustomer(model.getSite(), model.getCustomer());
-                        if (Objects.isNull(schedule)) {
-                            log.warn("can't query the data form DB for the site = {}, customer = {}", model.getSite(), model.getCustomer());
-                        }
-                        return schedule;
+                        return cdsLinkScheduleDao.queryBySiteAndCustomer(model.getSite(), model.getCustomer());
                     } catch (Exception ex) {
-                        log.error("query current data failed, site = "+model.getSite()+", customer = "+ model.getCustomer(), ex);
+                        log.error("query current data failed, site = " + model.getSite() + ", customer = " + model.getCustomer(), ex);
                     }
                     return null;
-                }).filter(Objects::nonNull).collect(Collectors.toList());
+                }).collect(Collectors.toList());
+
+                List<CdsLinkSchedule> failedFind = result.stream().filter(Objects::isNull).collect(Collectors.toList());
+                log.warn("the number that is queried is {} and the number that can not find from DB is {}, list = {}" , cachedDataList.size(), failedFind.size(), failedFind);
+
+                return result.stream().filter(Objects::nonNull).collect(Collectors.toList());
             }
 
 
@@ -143,33 +144,62 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
                     schedule.setOpcoNumber(dataModel.getSite());
                     schedule.setCustomerNumber(dataModel.getCustomer());
                     schedule.setDesignatedDelivery(dataModel.getDeliveryDays());
+                    schedule.setSyncToAs400Status("SYNC_DATA_REQUIRED");
+                    schedule.setSendDataStatus("SYNC_DATA_REQUIRED");
                     if (dataModel.getDeliveryDays().charAt(0) == '0') {
                         schedule.setCutOffSu(dataModel.getCutoff());
                         schedule.setRoutingGroupSu(dataModel.getRoutingCode());
+                    }else {
+                        schedule.setCutOffSu("");
+                        schedule.setRoutingGroupSu("");
                     }
                     if (dataModel.getDeliveryDays().charAt(1) == '0') {
                         schedule.setCutOffMo(dataModel.getCutoff());
                         schedule.setRoutingGroupMo(dataModel.getRoutingCode());
                     }
+                    else {
+                        schedule.setCutOffMo("");
+                        schedule.setRoutingGroupMo("");
+                    }
                     if (dataModel.getDeliveryDays().charAt(2) == '0') {
                         schedule.setCutOffTu(dataModel.getCutoff());
                         schedule.setRoutingGroupTu(dataModel.getRoutingCode());
+                    }
+                    else {
+                        schedule.setCutOffTu("");
+                        schedule.setRoutingGroupTu("");
                     }
                     if (dataModel.getDeliveryDays().charAt(3) == '0') {
                         schedule.setCutOffWe(dataModel.getCutoff());
                         schedule.setRoutingGroupWe(dataModel.getRoutingCode());
                     }
+                    else {
+                        schedule.setCutOffWe("");
+                        schedule.setRoutingGroupWe("");
+                    }
                     if (dataModel.getDeliveryDays().charAt(4) == '0') {
                         schedule.setCutOffTh(dataModel.getCutoff());
                         schedule.setRoutingGroupTh(dataModel.getRoutingCode());
+                    }
+                    else {
+                        schedule.setCutOffTh("");
+                        schedule.setRoutingGroupTh("");
                     }
                     if (dataModel.getDeliveryDays().charAt(5) == '0') {
                         schedule.setCutOffFr(dataModel.getCutoff());
                         schedule.setRoutingGroupFr(dataModel.getRoutingCode());
                     }
+                    else {
+                        schedule.setCutOffFr("");
+                        schedule.setRoutingGroupFr("");
+                    }
                     if (dataModel.getDeliveryDays().charAt(6) == '0') {
                         schedule.setCutOffSa(dataModel.getCutoff());
                         schedule.setRoutingGroupSa(dataModel.getRoutingCode());
+                    }
+                    else {
+                        schedule.setCutOffSa("");
+                        schedule.setRoutingGroupSa("");
                     }
 
                     result.add(schedule);
