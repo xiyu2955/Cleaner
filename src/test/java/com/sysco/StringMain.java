@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class StringMain {
     public static void main(String[] args) {
 
-        System.out.println("   0   ".length());
+        System.out.println("170000".substring(0, 2) + ":" + "170000".substring(2, 4));
 
     }
 
