@@ -28,7 +28,7 @@ class CleanerApplicationTests {
 	void contextLoads() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
 
 
-		JobParameter jobParameter = new JobParameter("D:\\data\\data0\\data0.xlsx");
+		JobParameter jobParameter = new JobParameter("D:\\data\\data1\\data1.xlsx");
 
 		jobLauncher.run(job, new JobParameters(Map.of("fileName", jobParameter)));
 	}

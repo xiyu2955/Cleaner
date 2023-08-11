@@ -150,7 +150,7 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
                     schedule.setCustomerNumber(dataModel.getCustomer());
                     schedule.setDesignatedDelivery(dataModel.getDeliveryDays());
                     schedule.setSyncToAs400Status("SYNC_DATA_REQUIRED");
-                    schedule.setSendDataStatus("SYNC_DATA_REQUIRED");
+                    schedule.setSendDataStatus("SEND_DATA_REQUIRED");
                     dataModel.setCutoff(dataModel.getCutoff() == null || dataModel.getCutoff().length() < 4 ? "": dataModel.getCutoff().substring(0,2)+":"+dataModel.getCutoff().substring(2,4));
                     if (dataModel.getDeliveryDays().charAt(0) == '0') {
                         schedule.setCutOffSu(dataModel.getCutoff());
