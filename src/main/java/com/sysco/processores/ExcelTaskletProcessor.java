@@ -54,7 +54,7 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
 
             private File bakFile = new File(pathName + "bak"+ index.decrementAndGet()+".json");
 
-            private Report<HashMap<String, ?>> report;
+            private final Report<HashMap<String, ?>> report = new Report<>();
 
 
             @Override
@@ -71,12 +71,11 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
             @Override
             public void doAfterAllAnalysed(AnalysisContext context) {
                 backAndUpdate(cachedDataList);
-                log.info("the total number that need to update is {}, and the number of update failed is {}, list = {}", report.getTotalNumberOfNeedUpdate(), report.getTotalNumberOfUpdateFailed(),report.getItemsOfUpdateFailed());
+                log.info("summary:-------------------------------------------------------\nthe total number that need to update is {}, and the number of update failed is {}, list = {}", report.getTotalNumberOfNeedUpdate(), report.getTotalNumberOfUpdateFailed(),report.getItemsOfUpdateFailed());
             }
 
 
             private void backAndUpdate(List<ConfigDataModel> cachedDataList) {
-                this.report = new Report<>();
                 List<CdsLinkSchedule> dbData = queryFromDb(cachedDataList);
                 backup(dbData);
                 HashMap<String, ?>[] prams = convertPrams(cachedDataList, dbData);
@@ -92,7 +91,7 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
                 }
                 report.setTotalNumberOfUpdateFailed(report.getTotalNumberOfUpdateFailed()+ faildList.size());
                 report.getItemsOfUpdateFailed().addAll(faildList);
-                log.info("The total number that will to update is {} and the number that failed to update is {}, and failed data is {}",prams.length ,faildList.size(), faildList);
+                log.info("The number that will to update is {} and the number that failed to update is {}, and failed data is {}",prams.length ,faildList.size(), faildList);
             }
 
 
