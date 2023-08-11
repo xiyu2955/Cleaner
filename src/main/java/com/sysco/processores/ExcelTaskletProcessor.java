@@ -6,6 +6,7 @@ import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.excel.util.ListUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.sysco.common.model.ConfigDataModel;
+import com.sysco.common.model.Report;
 import com.sysco.dao.CdsLinkScheduleDao;
 import com.sysco.entity.CdsLinkSchedule;
 import com.sysco.utils.JsonUtils;
@@ -53,7 +54,7 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
 
             private File bakFile = new File(pathName + "bak"+ index.decrementAndGet()+".json");
 
-
+            private Report<HashMap<String, ?>> report;
 
 
             @Override
@@ -70,14 +71,16 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
             @Override
             public void doAfterAllAnalysed(AnalysisContext context) {
                 backAndUpdate(cachedDataList);
+                log.info("the total number that need to update is {}, and the number of update failed is {}, list = {}", report.getTotalNumberOfNeedUpdate(), report.getTotalNumberOfUpdateFailed(),report.getItemsOfUpdateFailed());
             }
 
 
             private void backAndUpdate(List<ConfigDataModel> cachedDataList) {
-
+                this.report = new Report<>();
                 List<CdsLinkSchedule> dbData = queryFromDb(cachedDataList);
                 backup(dbData);
                 HashMap<String, ?>[] prams = convertPrams(cachedDataList, dbData);
+                report.setTotalNumberOfNeedUpdate(report.getTotalNumberOfNeedUpdate()+prams.length);
                 int[] result = cdsLinkScheduleDao.updateBySiteAndCustomer(prams);
 
                 ArrayList<HashMap<String, ?>> faildList = new ArrayList<>();
@@ -87,6 +90,8 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
 
                     }
                 }
+                report.setTotalNumberOfUpdateFailed(report.getTotalNumberOfUpdateFailed()+ faildList.size());
+                report.getItemsOfUpdateFailed().addAll(faildList);
                 log.info("The total number that will to update is {} and the number that failed to update is {}, and failed data is {}",prams.length ,faildList.size(), faildList);
             }
 
