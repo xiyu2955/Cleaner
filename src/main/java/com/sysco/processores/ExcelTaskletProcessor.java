@@ -109,16 +109,22 @@ public class ExcelTaskletProcessor implements TaskletProcessor {
             }
 
             private List<CdsLinkSchedule> queryFromDb(List<ConfigDataModel> cachedDataList){
+                ArrayList<ConfigDataModel> failedFind = new ArrayList<>();
                 List<CdsLinkSchedule> result = cachedDataList.stream().map(model -> {
                     try {
-                        return cdsLinkScheduleDao.queryBySiteAndCustomer(model.getSite(), model.getCustomer());
+                        CdsLinkSchedule linkSchedule = cdsLinkScheduleDao.queryBySiteAndCustomer(model.getSite(), model.getCustomer());
+                        if (Objects.isNull(linkSchedule)){
+                            failedFind.add(model);
+                        }
+                        return linkSchedule;
+
                     } catch (Exception ex) {
                         log.error("query current data failed, site = " + model.getSite() + ", customer = " + model.getCustomer(), ex);
                     }
                     return null;
                 }).collect(Collectors.toList());
 
-                List<CdsLinkSchedule> failedFind = result.stream().filter(Objects::isNull).collect(Collectors.toList());
+
                 log.warn("the number that is queried is {} and the number that can not find from DB is {}, list = {}" , cachedDataList.size(), failedFind.size(), failedFind);
 
                 return result.stream().filter(Objects::nonNull).collect(Collectors.toList());
